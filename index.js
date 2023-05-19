@@ -24,8 +24,13 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    // database collection
     const roboticToyCollection = client.db("techToyDataBase").collection("Toy");
-    const futureToyCollection = client.db("techToyDataBase").collection("futureToys");
+    const futureToyCollection = client
+      .db("techToyDataBase")
+      .collection("futureToys");
+    const addToyCollection = client.db("techToyDataBase").collection("addToy");
+
     //    robotic toy date get
     app.get("/roboticToy", async (req, res) => {
       const result = await roboticToyCollection.find().toArray();
@@ -35,6 +40,20 @@ async function run() {
     //     future toy data get
     app.get("/futureToys", async (req, res) => {
       const result = await futureToyCollection.find().toArray();
+      res.send(result);
+    });
+
+    // add toy data by post method
+    app.post("/addToy", async (req, res) => {
+      const toysData = req.body;
+      console.log(toysData);
+      const result = await addToyCollection.insertOne(toysData);
+      res.send(result);
+    });
+
+    //     get All toy data from database by get method
+    app.get("/allToy", async (req, res) => {
+      const result = await addToyCollection.find().toArray();
       res.send(result);
     });
 
