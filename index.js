@@ -3,7 +3,7 @@ const port = process.env.PORT || 5000;
 const cors = require("cors");
 const app = express("app");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 app.use(cors());
 app.use(express.json());
@@ -46,7 +46,7 @@ async function run() {
     // add toy data by post method
     app.post("/addToy", async (req, res) => {
       const toysData = req.body;
-      console.log(toysData);
+      //       console.log(toysData);
       const result = await addToyCollection.insertOne(toysData);
       res.send(result);
     });
@@ -54,6 +54,34 @@ async function run() {
     //     get All toy data from database by get method
     app.get("/allToy", async (req, res) => {
       const result = await addToyCollection.find().toArray();
+      res.send(result);
+    });
+
+    //     get data for my toy page by user email
+
+    app.get("/myToy/:email", async (req, res) => {
+      const toys = await addToyCollection
+        .find({
+          sellerMail: req.params.email,
+        })
+        .toArray();
+      res.send(toys);
+    });
+
+    //     update toy data from my toy page
+    app.put("/updateToy/:id", async (req, res) => {
+      const id = req.params.id;
+      const body = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateItem = {
+        $set: {
+          price: body.price,
+          quantity: body.quantity,
+          description: body.description,
+        },
+      };
+      const result = await addToyCollection.updateOne(filter, updateItem ,options);
       res.send(result);
     });
 
@@ -67,7 +95,7 @@ async function run() {
     //     await client.close();
   }
 }
-run().catch(console.log);
+run().catch(console.dir);
 
 app.get("/", (req, res) => {
   res.send("teach toy server is running");
