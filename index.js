@@ -32,8 +32,8 @@ async function run() {
     const allToyCollection = client.db("techToyDataBase").collection("addToy");
 
     // Creating index
-    const indexKeys = { price: 1 };
-    const indexOptions = { price: "price" };
+    const indexKeys = { ToyName: 1 };
+    const indexOptions = { ToyName: "ToyName" };
     // const result = await allToyCollection.createIndex(indexKeys, indexOptions);
     // console.log(result);
 
@@ -60,7 +60,13 @@ async function run() {
     //     get All toy data from database by get method
     app.get("/allToy", async (req, res) => {
       // console.log(req.params);
-      const result = await allToyCollection.find().toArray();
+      const result = await allToyCollection.find().limit(20).toArray();
+      res.send(result);
+    });
+    app.get("/allToy/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await allToyCollection.findOne(query);
       res.send(result);
     });
 
@@ -98,11 +104,11 @@ async function run() {
 
     // search implement by toy price
 
-    app.get("/searchToy/:number", async (req, res) => {
-      const price = req.params.number;
+    app.get("/searchToy/:ToyName", async (req, res) => {
+      const name = req.params.ToyName;
       const result = await allToyCollection
         .find({
-          $or: [{ price: { $regex: price } }],
+          $or: [{ ToyName: { $regex: name } }],
         })
         .toArray();
       res.send(result);
