@@ -29,7 +29,13 @@ async function run() {
     const futureToyCollection = client
       .db("techToyDataBase")
       .collection("futureToys");
-    const addToyCollection = client.db("techToyDataBase").collection("addToy");
+    const allToyCollection = client.db("techToyDataBase").collection("addToy");
+
+    // Creating index
+    const indexKeys = { price: 1 };
+    const indexOptions = { price: "price" };
+    // const result = await allToyCollection.createIndex(indexKeys, indexOptions);
+    // console.log(result);
 
     //    robotic toy date get
     app.get("/roboticToy", async (req, res) => {
@@ -47,20 +53,21 @@ async function run() {
     app.post("/addToy", async (req, res) => {
       const toysData = req.body;
       //       console.log(toysData);
-      const result = await addToyCollection.insertOne(toysData);
+      const result = await allToyCollection.insertOne(toysData);
       res.send(result);
     });
 
     //     get All toy data from database by get method
     app.get("/allToy", async (req, res) => {
-      const result = await addToyCollection.find().toArray();
+      // console.log(req.params);
+      const result = await allToyCollection.find().toArray();
       res.send(result);
     });
 
     //     get data for my toy page by user email
 
     app.get("/myToy/:email", async (req, res) => {
-      const toys = await addToyCollection
+      const toys = await allToyCollection
         .find({
           sellerMail: req.params.email,
         })
@@ -69,7 +76,7 @@ async function run() {
     });
 
     //     update toy data from my toy page
-    app.put("/updateToy/:id", async (req, res) => {
+    app.put("/updateMyToy/:id", async (req, res) => {
       const id = req.params.id;
       const body = req.body;
       const filter = { _id: new ObjectId(id) };
@@ -81,7 +88,31 @@ async function run() {
           description: body.description,
         },
       };
-      const result = await addToyCollection.updateOne(filter, updateItem ,options);
+      const result = await allToyCollection.updateOne(
+        filter,
+        updateItem,
+        options
+      );
+      res.send(result);
+    });
+
+    // search implement by toy price
+
+    app.get("/searchToy/:number", async (req, res) => {
+      const price = req.params.number;
+      const result = await allToyCollection
+        .find({
+          $or: [{ price: { $regex: price } }],
+        })
+        .toArray();
+      res.send(result);
+    });
+
+    // toy data delete in database by delete method
+    app.delete("/updateMyToy/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await allToyCollection.deleteOne(query);
       res.send(result);
     });
 
