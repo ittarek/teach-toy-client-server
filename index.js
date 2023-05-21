@@ -25,7 +25,10 @@ async function run() {
     await client.connect();
 
     // database collection
-    const roboticToyCollection = client.db("techToyDataBase").collection("Toy");
+    const roboticToyCollection = client.db("techToyDataBase").collection("roboticToy");
+    const amplifierToyCollection = client.db("techToyDataBase").collection("amplifierToy");
+    const motionToyCollection = client.db("techToyDataBase").collection("motionToy");
+
     const futureToyCollection = client
       .db("techToyDataBase")
       .collection("futureToys");
@@ -42,6 +45,43 @@ async function run() {
       const result = await roboticToyCollection.find().toArray();
       res.send(result);
     });
+
+    // get robotic toy data by id
+    app.get("/roboticToy/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await roboticToyCollection.findOne(query);
+      res.send(result);
+    });
+//  get amplifier toy data
+app.get('/amplifierToy' , async (req,res)=>{
+  const result = await amplifierToyCollection.find().toArray()
+  res.send(result)
+})
+
+// get amplifier toy data by id
+app.get('/amplifierToy/:id' , async (req,res) =>{
+  const id = req.params.id;
+  const query = {_id : new ObjectId(id)}
+  const result = await amplifierToyCollection.findOne(query)
+
+  res.send(result)
+})
+//  get motion toy data
+app.get('/motionToy' , async (req,res)=>{
+  const result = await motionToyCollection.find().toArray()
+  res.send(result)
+})
+
+// get motion toy data by id
+app.get('/motionToy/:id' , async (req,res) =>{
+  const id = req.params.id;
+  const query = {_id : new ObjectId(id)}
+  const result = await motionToyCollection.findOne(query)
+
+  res.send(result)
+})
+
 
     //     future toy data get
     app.get("/futureToys", async (req, res) => {
