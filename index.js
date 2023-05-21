@@ -25,7 +25,7 @@ async function run() {
     await client.connect();
 
     // database collection
-    const roboticToyCollection = client.db("techToyDataBase").collection("roboticToy");
+    const roboticToyCollection = client.db("techToyDataBase").collection("Toy");
     const amplifierToyCollection = client.db("techToyDataBase").collection("amplifierToy");
     const motionToyCollection = client.db("techToyDataBase").collection("motionToy");
 
